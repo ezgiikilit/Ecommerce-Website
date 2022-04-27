@@ -22,25 +22,25 @@ class AdminController extends Controller
 
     public function uploadproduct(Request $request)
     {
-        $data=new product;
+        $data = new product;
 
-        $image=$request->file;
+        $image = $request->file;
 
-       $imagename=time().'.'.$image->getClientOriginalExtension();
+        // resmin bilgilerini al ve kendine göre ayarla
+        $fullName = $image->getClientOriginalName();
+        $extension = $image->getClientOriginalExtension();
+        $onlyName = implode('', explode('.' . $extension, $fullName));
+        $filename = Str::slug($onlyName) . '-' . time() . '.' . $extension;
+        $imgname = $request->file->move('productimage', $filename);
+        $data->image = str_replace('\\', '/', $imgname);
 
-       $imagename=$image->getClientOriginalExtension();
+        $data->title = $request->title;
 
-       $request->file->move('productimage',$imagename);
+        $data->price = $request->price;
 
-        $data->image=$imagename;
+        $data->description = $request->description;
 
-        $data->title=$request->title;
-
-        $data->price=$request->price;
-
-        $data->description=$request->description;
-
-        $data->quantity=$request->quantity;
+        $data->quantity = $request->quantity;
 
         $data->save();
 
@@ -55,9 +55,17 @@ class AdminController extends Controller
 
     public function deleteproduct($id)
     {
-       $data= product::find($id);
-       $data->delete();
-    return redirect()->back()->with('message', 'Product Deleted Successfully!');    
+        $data = product::find($id);
+
+        // ürünle birlikte resmi sil ///////////////////////
+        if (!empty($data->image)) {
+            $image = public_path($data->image);
+            if (file_exists($image)) {unlink($image);}
+        }
+        //////////////////////////////////////////////////
+
+        $data->delete();
+        return redirect()->back()->with('message', 'Product Deleted Successfully!');
     }
 
     public function updateview($id)
