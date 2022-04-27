@@ -29,20 +29,21 @@
  
           </tr>
          
+                    @if (count($data)>0)
           @foreach($data as $product)
           <tr align="center" style="background-color: black;">
 
           @if(session()->has('message'))
- 
+
          <div class="alert alert-success">
-         
+
           <button type="button" class="close" data-dismiss="alert">
-         
+
           {{session()->get('message')}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
           X</button>
           </div>
-         
+
           @endif
 
               <td>{{$product->title}}</td>
@@ -50,7 +51,7 @@
               <td>{{$product->description}}</td>
               <td>{{$product->quantity}}</td>
               <td>
-                  <img height="100" width="100" src="/productimage/{{$product->image}}">
+                  <img height="100" width="100" src="{{asset($product->image)}}">
               </td>
 
               <td>
@@ -61,6 +62,10 @@
               </td>
             </tr>
            @endforeach
+           @else
+              <tr>
+                <td colspan="8" align="center">No Data Found :(</td>
+          @endif
          
            
       </table>
